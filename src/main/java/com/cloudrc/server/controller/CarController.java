@@ -1,5 +1,6 @@
 package com.cloudrc.server.controller;
 
+import com.cloudrc.server.dto.RegisterCarPayload;
 import com.cloudrc.server.enums.CarStatus;
 import com.cloudrc.server.model.Car;
 import com.cloudrc.server.service.CarService;
@@ -16,8 +17,8 @@ public class CarController {
     private CarService carService;
 
     @PostMapping("/register")
-    public ResponseEntity<Car> registerCar(@RequestBody String carName, @RequestBody Long carId){
-        return ResponseEntity.status(200).body(carService.registerCar(carName, carId));
+    public ResponseEntity<Car> registerCar(@RequestBody RegisterCarPayload payload) {
+        return ResponseEntity.status(200).body(carService.registerCar(payload.getName(), payload.getCarId()));
     }
 
     @GetMapping("/getAll")

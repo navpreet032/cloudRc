@@ -19,5 +19,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     public List<Booking> findByBookingStatusOrderByCreatedAtAsc(BookingStatus bookingStatus);
     public Optional<Booking> findByUserAndBookingStatus(User user, BookingStatus bookingStatus);
     public int countByCarAndBookingStatusAndCreatedAtBefore(Car car, BookingStatus bookingStatus, LocalDateTime createdAt);
-
+    public List<Booking> findByCarAndBookingStatusOrderByCreatedAtAsc(Car car, BookingStatus status);
 }

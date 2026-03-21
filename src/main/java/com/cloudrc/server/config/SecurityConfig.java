@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/cars/**").permitAll()
                         .anyRequest().authenticated()        // everything else needs JWT
                 )
                 .sessionManagement(session -> session
