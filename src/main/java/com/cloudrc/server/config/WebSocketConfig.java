@@ -4,9 +4,15 @@ import com.cloudrc.server.websocket.Esp32WsHandler;
 import com.cloudrc.server.websocket.StompAuthChannelInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
+import org.springframework.web.socket.server.HandshakeInterceptor;
+
+import java.util.Map;
 
 @Configuration
 @EnableWebSocket
@@ -22,7 +28,25 @@ public class WebSocketConfig implements WebSocketConfigurer, WebSocketMessageBro
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(esp32WsHandler, "/esp32")
-                .setAllowedOrigins("*");
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(new HandshakeInterceptor() {
+                    @Override
+                    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
+                                                   WebSocketHandler wsHandler, Map<String, Object> attributes) {
+                        System.out.println("[WS Handshake] URI: " + request.getURI());
+                        System.out.println("[WS Handshake] Headers: " + request.getHeaders());
+                        return true; // force allow everything
+                    }
+
+                    @Override
+                    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
+                                               WebSocketHandler wsHandler, Exception exception) {
+                        if (exception != null) {
+                            System.out.println("[WS Handshake] FAILED: " + exception.getMessage());
+                        }
+                    }
+                });
+
     }
 
 
