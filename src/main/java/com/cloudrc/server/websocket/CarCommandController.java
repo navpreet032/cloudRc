@@ -64,17 +64,25 @@ public class CarCommandController {
         // 4. Validate values
         float t = payload.getT();
         float s = payload.getS();
-        if (t < -1.0 || t > 1.0 || s < -1.0 || s > 1.0) {
+        try {
+            if (t < -1.0 || t > 1.0 || s < -1.0 || s > 1.0) {
+                messagingTemplate.convertAndSendToUser(
+                        principal.getName(),
+                        "/queue/errors",
+                        "Values must be between -1.0 and 1.0"
+                );
+                return;
+            }
+
+            // 5. Forward to ESP32
+            String command = String.format("{\"t\":%.2f,\"s\":%.2f}", t, s);
+            esp32WsHandler.sendCommand(carId, command);
+        }catch (RuntimeException e) {
             messagingTemplate.convertAndSendToUser(
                     principal.getName(),
                     "/queue/errors",
-                    "Values must be between -1.0 and 1.0"
+                    "Car is offline or not connected"
             );
-            return;
         }
-
-        // 5. Forward to ESP32
-        String command = String.format("{\"t\":%.2f,\"s\":%.2f}", t, s);
-        esp32WsHandler.sendCommand(carId, command);
     }
 }

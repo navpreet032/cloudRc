@@ -41,7 +41,6 @@ public class Esp32WsHandler extends TextWebSocketHandler {
         Long carIdLong = Long.parseLong(carId);
         esp32Sessions.put(carIdLong, session);
 
-
         carService.updateCarStatus(carIdLong, CarStatus.IDLE);
 
         System.out.println("[ESP32] Car " + carId + " connected");
@@ -76,7 +75,9 @@ public class Esp32WsHandler extends TextWebSocketHandler {
         WebSocketSession session = esp32Sessions.get(carId);
 
         if (!isConnected(carId)) {
+
             throw new RuntimeException("ESP32 not connected for car: " + carId);
+
         }
 
         session.sendMessage(new TextMessage(command));
