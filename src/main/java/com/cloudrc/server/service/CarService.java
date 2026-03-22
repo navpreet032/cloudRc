@@ -8,6 +8,8 @@ import com.cloudrc.server.repository.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +40,7 @@ public class CarService {
     public Car updateCarStatus(Long carId, CarStatus status){
         Car car = getCarById(carId);
         car.setStatus(status);
+        car.setLastSeen(LocalDateTime.now());
         return carRepository.save(car);
 
 

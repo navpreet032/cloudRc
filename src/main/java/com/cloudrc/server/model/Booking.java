@@ -21,7 +21,7 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="car_id")
     private Car car;
-
+    @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus = BookingStatus.QUEUED;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
