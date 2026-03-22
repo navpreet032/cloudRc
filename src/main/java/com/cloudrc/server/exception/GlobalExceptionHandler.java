@@ -33,6 +33,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)  // 500
-                .body(new ErrorResponse(500, "Something went wrong"));
+                .body(new ErrorResponse(500, ex.getMessage()));
     }
 }

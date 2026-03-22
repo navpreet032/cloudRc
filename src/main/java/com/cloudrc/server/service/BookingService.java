@@ -11,9 +11,12 @@ import com.cloudrc.server.repository.BookingRepository;
 import com.cloudrc.server.repository.CarRepository;
 import com.cloudrc.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 
@@ -28,6 +31,20 @@ public class BookingService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TaskScheduler taskScheduler;
+
+    private void scheduleExpiry(Booking booking) {
+        Instant expiryTime = booking.getEndTime()
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
+
+        taskScheduler.schedule(
+                () -> expireBooking(booking.getId()),
+                expiryTime
+        );
+    }
 
     // ── Create booking ────────────────────────────────────
     public Booking createBooking(Long userId, Long carId) {
@@ -71,6 +88,10 @@ public class BookingService {
             // Update car status
             car.setStatus(CarStatus.IN_USE);
             carRepository.save(car);
+            Booking saved = bookingRepository.save(booking);
+            scheduleExpiry(saved);
+            return saved;
+
 
         } else {
             // 5. Car is IN_USE — add to queue
@@ -84,9 +105,10 @@ public class BookingService {
             booking.setQueuePosition(position);
             booking.setStartTime(null);
             booking.setEndTime(null);
+            return bookingRepository.save(booking);
         }
 
-        return bookingRepository.save(booking);
+
     }
 
     // ── Cancel booking ────────────────────────────────────
@@ -150,7 +172,8 @@ public class BookingService {
         next.setStartTime(LocalDateTime.now());
         next.setEndTime(LocalDateTime.now().plusMinutes(30));
         next.setQueuePosition(null);
-        bookingRepository.save(next);
+        Booking saved = bookingRepository.save(next);
+        scheduleExpiry(saved);
 
         // Update queue positions for everyone else
         for (int i = 1; i < queue.size(); i++) {

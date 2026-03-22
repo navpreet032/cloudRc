@@ -23,6 +23,7 @@ public class CarService {
         Car car = new Car();
         car.setName(name);
         car.setId(carId);
+
        return carRepository.save(car);
     }
 
