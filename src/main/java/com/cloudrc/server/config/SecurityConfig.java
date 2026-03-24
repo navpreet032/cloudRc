@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/esp32/**").permitAll()
                         .requestMatchers("/esp32").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/cars/validate-cam").permitAll()
                         .anyRequest().authenticated()        // everything else needs JWT
                 )
                 .sessionManagement(session -> session
